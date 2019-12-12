@@ -108,3 +108,112 @@ def t_DECIMAL(t):
 
 def t_ENTERO(t):
     r'\d+'
+    t.value = int(t.value)
+    return t
+
+
+def t_NUMERAL(t):
+    r'\#'
+    return t
+
+# operacion logica
+
+
+def t_PLUSPLUS(t):
+    r'\+\+'
+    return t
+
+
+def t_MENORIGUAL(t):
+    r'<='
+    return t
+
+
+def t_MAYORIGUAL(t):
+    r'>='
+    return t
+
+
+def t_IGUAL(t):
+    r'=='
+    return t
+
+
+def t_MAYORDER(t):
+    r'<<'
+    return t
+
+
+def t_MAYORIZQ(t):
+    r'>>'
+    return t
+
+
+def t_DISTINTO(t):
+    r'!='
+    return t
+
+
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+
+def t_COMENTARIO(t):
+    r'/\*(.|\n)*?\*/'
+    t.lexer.lineno += t.value.count('\n')
+    print("Comentario de multiple linea")
+
+
+def t_comments_ONELine(t):
+    r'\/\/(.)*\n'
+    t.lexer.lineno += 1
+    print("Comentario de una linea")
+
+
+t_ignore = ' \t'
+
+
+def t_error(t):
+    global resultado_lexema
+    estado = "** Token no valido en la Linea {:4}".format(str(t.lineno)
+                                                          )
+    resultado_lexema.append(estado)
+    t.lexer.skip(1)
+
+
+# Prueba de ingreso
+
+def prueba(data):
+    global resultado_lexema
+
+    analizador = lex.lex()
+    analizador.input(data)
+    while True:
+        tok = analizador.token()
+        if not tok:
+            break
+        # print("lexema de "+tok.type+" valor "+tok.value+" linea "tok.lineno)
+        estado = "Linea {:4} Tipo {:4} Valor {:4}".format(
+            str(tok.lineno), str(tok.type), str(tok.value))
+        resultado_lexema.append(estado)
+
+    return resultado_lexema
+
+
+# abrir archivo
+analizador = lex.lex()
+path = "index.php"
+
+try:
+    archivo = open(path, 'r')
+except:
+    print("el archivo no se encontro")
+    quit()
+
+text = ""
+for linea in archivo:
+    text += linea
+prueba(text)
+# AL IMPRIMIR LOS DATOS, ESTO LO ORDENA DE MANERA ESTRUCTURADA
+print('\n'.join(list(map(''.join, resultado_lexema))))
