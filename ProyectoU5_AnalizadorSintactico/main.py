@@ -112,3 +112,116 @@ def p_expresion_logicas(t):
                 |  expresion MENORIGUAL expresion 
                 |   expresion MAYORIGUAL expresion 
                 |   expresion IGUAL expresion 
+                |   expresion DISTINTO expresion
+                |  PARIZQ expresion PARDER MENORQUE PARIZQ expresion PARDER
+                |  PARIZQ expresion PARDER MAYORQUE PARIZQ expresion PARDER
+                |  PARIZQ expresion PARDER MENORIGUAL PARIZQ expresion PARDER 
+                |  PARIZQ  expresion PARDER MAYORIGUAL PARIZQ expresion PARDER
+                |  PARIZQ  expresion PARDER IGUAL PARIZQ expresion PARDER
+                |  PARIZQ  expresion PARDER DISTINTO PARIZQ expresion PARDER
+    '''
+    if t[2] == "<":
+        t[0] = t[1] < t[3]
+    elif t[2] == ">":
+        t[0] = t[1] > t[3]
+    elif t[2] == "<=":
+        t[0] = t[1] <= t[3]
+    elif t[2] == ">=":
+        t[0] = t[1] >= t[3]
+    elif t[2] == "==":
+        t[0] = t[1] is t[3]
+    elif t[2] == "!=":
+        t[0] = t[1] != t[3]
+    elif t[3] == "<":
+        t[0] = t[2] < t[4]
+    elif t[2] == ">":
+        t[0] = t[2] > t[4]
+    elif t[3] == "<=":
+        t[0] = t[2] <= t[4]
+    elif t[3] == ">=":
+        t[0] = t[2] >= t[4]
+    elif t[3] == "==":
+        t[0] = t[2] is t[4]
+    elif t[3] == "!=":
+        t[0] = t[2] != t[4]
+
+
+
+    # print('logica ',[x for x in t])
+#t[0] = t[1]
+
+def p_expresion_numero(t):
+    'expresion : ENTERO'
+    t[0] = t[1]
+
+
+def p_expresion_decimal(t):
+    'expresion : DECIMAL'
+    t[0] = t[1]
+
+
+# def p_expresion_cadena(t):
+   # 'expresion : COMDOB expresion COMDOB'
+   # t[0] = t[2]
+
+
+def p_expresion_nombre(t):
+    'expresion : VARIABLE'
+    try:
+        t[0] = nombres[t[1]]
+    except LookupError:
+        print("")
+        print("VERIFICAR: ", t[1])
+        print("¿verificar si se definio o asigno un valor(en caso de operacion arimetica)?")
+        t[0] = 0
+
+
+
+def p_error(t):
+    global resultado_gramatica
+    if t:
+        resultado = "Error sintactico de tipo {:4} en el valor {:4}".format(
+            str(t.type), str(t.value))
+       # print("SINTAXIS ERROR")
+       # print(resultado)
+    else:
+        resultado = "Error sintactico {}".format(t)
+       # print(resultado)
+    resultado_gramatica.append(resultado)
+
+
+# instanciamos el analizador sistactico
+parser = yacc.yacc()
+
+
+def prueba_sintactica(data):
+    global resultado_gramatica
+   # resultado_gramatica.clear()
+
+    for item in data.splitlines():
+        if item:
+            gram = parser.parse(item)
+            if gram:
+                resultado_gramatica.append(str(gram))
+        else:
+            print("")
+    #print("result: ", resultado_gramatica)
+    return resultado_gramatica
+
+
+path = "index.php"
+
+try:
+    archivo = open(path, 'r')
+except:
+    print("el archivo no se encontro")
+    quit()
+
+text = ""
+for linea in archivo:
+    text += linea
+
+
+prueba_sintactica(text)
+print('-------------------------------------------------')
+print('\n'.join(list(map(''.join, resultado_gramatica))))
